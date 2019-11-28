@@ -1,61 +1,33 @@
-version: "2.2"
+version: '2'
 
 services:
-  mysql:
-      image: mysql:5.6
-      restart: always
-      volumes:
-        - mysql-vol:/var/lib/mysql
-      networks:
-        wp-network:
-          ipv4_address: 196.170.0.3
-      env:
-        MYSQL_ROOT_PASSWORD: toto
-        MYSQL_DATABASE: wordpress
-        MYSQL_USER: wordpress
-        MYSQL_PASSWORD: wordpress
 
-  wordpress:
-      build:
-        context: .
-        dockerfile: Dockerfile.wordpress
-      image: my-wordpress:0.1
-      restart: always
-      ports:
-        - "8080:8080"
-      networks:
-        wp-network:
-          ipv4_address: 192.170.0.2
-#      mem_limit: 300m
-#      mem_reservation: 100m
-#      cpu_shares: 50
-      volumes:
-        - wp-vol:/var/www/html
-      logging:
-        driver: syslog
-        options:
-          syslog-address: "udp://127.0.0.1:514"
-      depends_on:
-      - mysql
+  # Application python
+  web:
+    [ ... compléter ... ]
+ 
+#    Option utiliser par le load balancer    
+#    labels:
+#      - "traefik.frontend.rule=Host:whoami.docker.localhost"
+    depends_on:
+    - redis
 
+  redis:
+  [ ... compléter ... ]
 
-  rsyslog:
-      image: objectiflibre/syslog:latest
-      ports:
-      - "514:514/udp"
-      networks:
-        wp-network:
-          ipv4_address: 192.170.0.4
+  # lb:
+  #   image: traefik 
+  #   command: --api --docker
+  #   ports:
+  #     - "80:80"     # The HTTP port
+  #     - "8080:8080"   # GUI
+  #   volumes:
+  #   - /var/run/docker.sock:/var/run/docker.sock
+  #   networks:
+  #   - app-network
 
 networks:
-  wpnetwork:
-    ipam:
-      driver: default
-      config:
-      -  subnet: 192.170.0.0/16
+  app-network:
 
 volumes:
-  mysql-vol:
-  wp-vol:
-
-
+  redis-vol:
